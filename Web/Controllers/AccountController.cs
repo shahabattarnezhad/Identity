@@ -57,12 +57,37 @@ namespace Web.Controllers
             return View(registerVm);
         }
 
+        [HttpGet]
+        public IActionResult Login()
+        {
+            var viewModel = new LoginVm();
+            return View(viewModel);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginVm loginVm)
+        {
+            
+
+            return View(loginVm);
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(controllerName: "Home", actionName: "Index");
         }
     }
 }

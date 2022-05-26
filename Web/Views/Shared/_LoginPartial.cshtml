@@ -1,8 +1,22 @@
-﻿<ul class="navbar-nav">
+﻿@inject UserManager<IdentityUser> UserManager;
+@inject SignInManager<IdentityUser> SignInManager;
+
+
+<ul class="navbar-nav">
+    @if(SignInManager.IsSignedIn(User)){
+    <li class="nav-item">
+        <a class="nav-link text-light" href="#"> Welcome @UserManager.GetUserName(User) </a>
+    </li>
+    <form class="form-inline" method="post" asp-controller="Account" asp-action="Logout">
+        <button class="btn nav-link" type="submit"> Logout </button>
+    </form>
+    }
+    else{
     <li class="nav-item">
         <a class="nav-link text-light" asp-controller="Account" asp-action="Login"> Login </a>
     </li>
     <li class="nav-item">
         <a class="nav-link text-light" asp-controller="Account" asp-action="Register"> Register </a>
     </li>
+    }
 </ul>
