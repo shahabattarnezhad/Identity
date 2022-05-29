@@ -21,6 +21,8 @@ namespace Web
         {
             services.ConfigureSqlServerConnection(Configuration);
             services.ConfigureIdentity();
+            services.ConfigureIdentityOptions();
+            services.ConfigureEmailSetting();
 
             services.AddControllersWithViews();
         }
