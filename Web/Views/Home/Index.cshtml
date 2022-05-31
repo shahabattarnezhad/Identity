@@ -6,6 +6,25 @@
 <div class="row mt-5" style="width: 100%; height: 500px;">
     <div class="col-md-4 text-start ml-0">
         <h1 class="display-4">Welcome</h1>
+        @if (User.Identity.IsAuthenticated)
+        {
+            var twoFactor = ViewData["TwoFactorEnabled"];
+            if (twoFactor != null && twoFactor.ToString().ToLower() == "true")
+            {
+                <a class="btn btn-sm btn-warning" asp-controller="Account" asp-action="RemoveAuthenticator">
+                    Reset and Remove two factor authentication
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-danger mt-3 mb-3">
+                    <h1> Please enable the authenticator </h1>
+                    <a class="btn btn-sm btn-warning" asp-controller="Account" asp-action="EnableAuthenticator">
+                        Setup two factor authentication
+                    </a>
+                </div>
+            }
+        }
         <p>
             The Authentication and Authorization concepts are two main
             and necessary logic for any application.

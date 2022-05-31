@@ -1,0 +1,39 @@
+﻿@model TwoFactorAuthenticationVm
+@{
+    ViewData["Title"] = "Two Factor Authentication Page";
+}
+
+<div class="row">
+    <div class="col-md-5 mt-5 mb-3">
+        <h3 class="text-dark">
+            Please enter the code below in your authenticator app
+        </h3>
+        <h3 class="text-info">
+            @Model.Token
+        </h3>
+    </div>
+    <div class="col-md-2 mt-5"> <h1 class="text-primary"> OR </h1> </div>
+    <div class="col-md-5 mt-5 mb-5">
+        <h3 class="text-dark">
+            User QR code
+        </h3>
+        <div id="qrCode">
+        </div>
+    </div>
+</div>
+<form asp-controller="Account" asp-action="EnableAuthenticator" method="post">
+    <input type="hidden" asp-for="Token" />
+
+    <div class="form-group">
+        Enter code: <input type="text" class="form-control" asp-for="Code" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3"> Submit </button>
+</form>
+
+@section Scripts{
+    <script src="~/js/qrcode.js"></script>
+    <script type="text/javascript">
+        new QRCode(document.getElementById("qrCode"), "@Model.QRCodeUrl");
+    </script>
+}
