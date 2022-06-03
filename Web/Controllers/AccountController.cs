@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Web.Models;
@@ -13,18 +15,21 @@ namespace Web.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailService _emailService;
         private readonly UrlEncoder _urlEncoder;
 
         public AccountController(UserManager<IdentityUser> userManager,
                                  SignInManager<IdentityUser> signInManager,
                                  IEmailService emailService,
-                                 UrlEncoder urlEncoder)
+                                 UrlEncoder urlEncoder,
+                                 RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _urlEncoder = urlEncoder;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -35,9 +40,30 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Register(string returnUrl = null)
         {
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+            }
+
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Admin",
+                Text = "Admin"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "User",
+                Text = "User"
+            });
+
             ViewData["ReturnUrl"] = returnUrl;
 
-            var viewModel = new RegisterVm();
+            var viewModel = new RegisterVm()
+            {
+                RoleList = listItems
+            };
             return View(viewModel);
         }
 
@@ -61,6 +87,17 @@ namespace Web.Controllers
                 var result = await _userManager.CreateAsync(user, registerVm.Password);
                 if (result.Succeeded)
                 {
+                    if(registerVm.RoleSelected != null 
+                        && registerVm.RoleSelected.Length > 0
+                        && registerVm.RoleSelected == "Admin")
+                    {
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+                    }
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                     var callBackUrl =
@@ -83,19 +120,33 @@ namespace Web.Controllers
                 AddErrors(result);
             }
 
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Admin",
+                Text = "Admin"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "User",
+                Text = "User"
+            });
+
+            registerVm.RoleList = listItems;
+
             return View(registerVm);
         }
 
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-            if(userId is null || code is null)
+            if (userId is null || code is null)
             {
                 return View("Error");
             }
 
             var user = await _userManager.FindByIdAsync(userId);
-            if(user is null)
+            if (user is null)
             {
                 return View("Error");
             }
@@ -132,7 +183,7 @@ namespace Web.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(VerifyAuthenticatorCode), new {  returnUrl, loginVm.RememberMe});
+                    return RedirectToAction(nameof(VerifyAuthenticatorCode), new { returnUrl, loginVm.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -171,7 +222,7 @@ namespace Web.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(forgotPasswordVm.Email);
 
-                if(user == null)
+                if (user == null)
                 {
                     return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
@@ -185,7 +236,7 @@ namespace Web.Controllers
                 {
                     To = forgotPasswordVm.Email,
                     Subject = "Reset Password",
-                    Body = $"Dear { user.Email }, please reset your password by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
+                    Body = $"Dear {user.Email}, please reset your password by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
                 };
 
                 _emailService.SendMail(emailVm);
@@ -207,7 +258,7 @@ namespace Web.Controllers
         {
             //return code == null ? View("Error") : View();
 
-            if(code == null)
+            if (code == null)
             {
                 return View("Error");
             }
@@ -260,7 +311,7 @@ namespace Web.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             await _userManager.ResetAuthenticatorKeyAsync(user);
-            
+
             await _userManager.SetTwoFactorEnabledAsync(user, false);
 
             return RedirectToAction(nameof(Index), "Home");
@@ -296,7 +347,7 @@ namespace Web.Controllers
             {
                 var user = await _userManager.GetUserAsync(User);
                 var succeeded = await _userManager
-                    .VerifyTwoFactorTokenAsync(user, 
+                    .VerifyTwoFactorTokenAsync(user,
                                                _userManager.Options.Tokens.AuthenticatorTokenProvider,
                                                model.Code);
                 if (succeeded)
@@ -322,7 +373,7 @@ namespace Web.Controllers
         public async Task<IActionResult> VerifyAuthenticatorCode(bool rememberMe, string returnUrl = null)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if(user is null)
+            if (user is null)
             {
                 return View("Error");
             }
@@ -364,6 +415,11 @@ namespace Web.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid Code");
                 return View(model);
             }
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

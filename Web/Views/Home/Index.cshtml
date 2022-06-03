@@ -24,6 +24,15 @@
                     </a>
                 </div>
             }
+
+            @if (User.IsInRole("Admin"))
+            {
+                <h3> Your role is Admin </h3>
+            }
+            else
+            {
+                <h3> Your role is User </h3>
+            }
         }
         <p>
             The Authentication and Authorization concepts are two main
