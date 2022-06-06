@@ -1,0 +1,66 @@
+﻿@model IdentityRole
+@{
+    ViewData["Title"] = "Creation of Role Page";
+}
+
+<div class="mt-5">
+
+    <form method="post" asp-controller="Roles" asp-action="InsertUpdate">
+
+        @if (Model is not null && !string.IsNullOrEmpty(Model.Id))
+        {
+            ViewData["Title"] = "Updation of Role Page";
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <div class="border p-3 bg-white">
+            <div class="form-group row mb-5">
+                <h2 class="text-info pl-3"> @ViewData["Title"] </h2>
+                <hr />
+            </div>
+
+            <div class="row">
+                <div class="col-8">
+                    <div class="form-group row py-2">
+                        <div class="col-4">
+                            <label asp-for="Id"></label>
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control" asp-for="Id" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group row py-2">
+                        <div class="col-4">
+                            <label asp-for="Name"></label>
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control" asp-for="Name" autocomplete="off" />
+                            <span class="text-danger" asp-validation-for="Name"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row py-2">
+                        <div class="col-8 offset-4 row">
+                            <div class="col">
+                                @if (Model is not null && !string.IsNullOrEmpty(Model.Id))
+                                {
+                                // Updation
+                                    <input type="submit" class="btn btn-info w-100" value="Update" />
+                                }
+                                else
+                                {
+                                    // Creation
+                                    <input type="submit" class="btn btn-primary w-100" value="Create" />
+                                }
+                            </div>
+                            <div class="col">
+                                <a class="btn btn-success w-100" asp-controller="Roles" asp-action="Index"> Back to List </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>

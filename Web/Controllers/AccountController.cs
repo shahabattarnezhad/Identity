@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -16,12 +17,12 @@ namespace Web.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IEmailService _emailService;
+        private readonly IEmailSender _emailService;
         private readonly UrlEncoder _urlEncoder;
 
         public AccountController(UserManager<IdentityUser> userManager,
                                  SignInManager<IdentityUser> signInManager,
-                                 IEmailService emailService,
+                                 IEmailSender emailService,
                                  UrlEncoder urlEncoder,
                                  RoleManager<IdentityRole> roleManager)
         {
@@ -104,14 +105,17 @@ namespace Web.Controllers
                     Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code },
                     protocol: HttpContext.Request.Scheme);
 
-                    var emailVm = new EmailVm()
-                    {
-                        To = registerVm.Email,
-                        Subject = "Account Confirmation",
-                        Body = $"Dear {user.Email}, please confirm your account by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
-                    };
+                    //var emailVm = new EmailVm()
+                    //{
+                    //    To = registerVm.Email,
+                    //    Subject = "Account Confirmation",
+                    //    Body = $"Dear {user.Email}, please confirm your account by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
+                    //};
 
-                    _emailService.SendMail(emailVm);
+                    //_emailService.SendMail(emailVm);
+                    _emailService.SendEmailAsync(registerVm.Email,
+                                                 "Account Confirmation",
+                                                 $"Dear {user.Email}, please confirm your account by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
@@ -232,14 +236,17 @@ namespace Web.Controllers
                     Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code },
                     protocol: HttpContext.Request.Scheme);
 
-                var emailVm = new EmailVm()
-                {
-                    To = forgotPasswordVm.Email,
-                    Subject = "Reset Password",
-                    Body = $"Dear {user.Email}, please reset your password by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
-                };
+                //var emailVm = new EmailVm()
+                //{
+                //    To = forgotPasswordVm.Email,
+                //    Subject = "Reset Password",
+                //    Body = $"Dear {user.Email}, please reset your password by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>"
+                //};
 
-                _emailService.SendMail(emailVm);
+                //_emailService.Send(emailVm);
+                _emailService.SendEmailAsync(forgotPasswordVm.Email,
+                                                 "Reset Password",
+                                                 $"Dear {user.Email}, please reset your password by clicking on the following link: <a href=\"" + callBackUrl + "\">click here</a>");
 
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }

@@ -4,10 +4,12 @@ using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Threading.Tasks;
 
 namespace Web.Services.EmailService
 {
-    public class EmailService : IEmailService
+    public class EmailService : IEmailSender
     {
         private readonly IConfiguration _config;
 
@@ -16,20 +18,20 @@ namespace Web.Services.EmailService
             _config = config;
         }
 
-        public void SendMail(EmailVm emailVm)
+        public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var email = new MimeMessage();
+            var readyToSendEmail = new MimeMessage();
 
-            email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailSettings")
-                                                       .GetValue<string>("EmailUserName")));
+            readyToSendEmail.From.Add(MailboxAddress.Parse(_config.GetSection("EmailSettings")
+                                                    .GetValue<string>("EmailUserName")));
 
-            email.To.Add(MailboxAddress.Parse(emailVm.To));
+            readyToSendEmail.To.Add(MailboxAddress.Parse(email));
 
-            email.Subject = emailVm.Subject;
+            readyToSendEmail.Subject = subject;
 
-            email.Body = new TextPart(TextFormat.Html)
+            readyToSendEmail.Body = new TextPart(TextFormat.Html)
             {
-                Text = emailVm.Body
+                Text = htmlMessage
             };
 
             using var smtp = new SmtpClient();
@@ -44,9 +46,44 @@ namespace Web.Services.EmailService
 
             smtp.Authenticate(userName: _config.GetSection("EmailSettings").GetValue<string>("EmailUserName"),
                               password: _config.GetSection("EmailSettings").GetValue<string>("EmailPassword"));
-            smtp.Send(email);
+            smtp.Send(readyToSendEmail);
             smtp.Disconnect(true);
+
+            return Task.CompletedTask;
+            //throw new System.NotImplementedException();
         }
+
+        //public void SendMail(EmailVm emailVm)
+        //{
+        //    var email = new MimeMessage();
+
+        //    email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailSettings")
+        //                                               .GetValue<string>("EmailUserName")));
+
+        //    email.To.Add(MailboxAddress.Parse(emailVm.To));
+
+        //    email.Subject = emailVm.Subject;
+
+        //    email.Body = new TextPart(TextFormat.Html)
+        //    {
+        //        Text = emailVm.Body
+        //    };
+
+        //    using var smtp = new SmtpClient();
+
+        //    smtp.Connect(host: _config.GetSection("EmailSettings").GetValue<string>("EmailHost"),
+        //                 port: 587,
+        //                 SecureSocketOptions.StartTls);
+
+        //    smtp.Connect("smtp.gmail.com");
+        //    smtp.Connect("smtp.live.com");
+        //    smtp.Connect("smtp.office365.com");
+
+        //    smtp.Authenticate(userName: _config.GetSection("EmailSettings").GetValue<string>("EmailUserName"),
+        //                      password: _config.GetSection("EmailSettings").GetValue<string>("EmailPassword"));
+        //    smtp.Send(email);
+        //    smtp.Disconnect(true);
+        //}
     }
 }
 

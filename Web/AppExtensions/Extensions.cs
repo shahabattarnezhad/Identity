@@ -39,7 +39,7 @@ namespace Web.AppExtensions
 
         public static void ConfigureEmailSetting(this IServiceCollection services)
         {
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmailSender, EmailService>();
         }
     }
 }

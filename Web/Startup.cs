@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Web.AppExtensions;
+using Web.Services.EmailService;
 
 namespace Web
 {
@@ -22,6 +24,7 @@ namespace Web
             services.ConfigureSqlServerConnection(Configuration);
             services.ConfigureIdentity();
             services.ConfigureIdentityOptions();
+            services.ConfigureEmailSetting();
             services.ConfigureEmailSetting();
 
             services.AddControllersWithViews();
