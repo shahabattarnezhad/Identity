@@ -357,7 +357,24 @@ namespace Web.Controllers
                 else
                 {
                     ModelState.AddModelError("Verify", "Validation cannot be completed.");
-                    return View(model);
+
+                    string authenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+
+                    await _userManager.ResetAuthenticatorKeyAsync(user);
+                    var token = await _userManager.GetAuthenticatorKeyAsync(user);
+
+                    string AuthenticatorUri = string.Format(authenticatorUriFormat,
+                                                    _urlEncoder.Encode("Identity"),
+                                                    _urlEncoder.Encode(user.Email),
+                                                    token);
+
+                    var renewedModel = new TwoFactorAuthenticationVm()
+                    {
+                        Token = token,
+                        QRCodeUrl = AuthenticatorUri
+                    };
+
+                    return View(renewedModel);
                 }
             }
 
