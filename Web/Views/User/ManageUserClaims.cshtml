@@ -1,0 +1,34 @@
+﻿@model UserClaimsVm
+@{
+    ViewData["Title"] = "Assign Claim to The User Page";
+}
+
+<div class="mt-5">
+
+    <form method="post" asp-controller="User" asp-action="ManageUserClaims">
+        <input type="hidden" asp-for="UserId" />
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-info"> Manage User Claims / Permissions </h2>
+            </div>
+            <div class="card-body">
+                @for (int i = 0; i < Model.Claims.Count; i++)
+                {
+                    <div class="m-2 form-check">
+                        <input type="hidden" asp-for="Claims[i].ClaimType" />
+                        <input type="checkbox" asp-for="Claims[i].IsSelected" class="form-check-input" />
+                        <label class="form-check-label" asp-for="Claims[i].IsSelected">
+                            @Model.Claims[i].ClaimType
+                        </label>
+                    </div>
+                }
+                <div class="text-danger" asp-validation-summary="All"></div>
+            </div>
+            <div class="card-footer">
+                <input type="submit" class="btn btn-success" value="Update" />
+                <a class="btn btn-warning" asp-controller="User" asp-action="Index"> Back to List </a>
+            </div>
+        </div>
+    </form>
+
+</div>
