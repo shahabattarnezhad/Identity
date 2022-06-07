@@ -14,7 +14,7 @@
 </div>
 
 <div class="p-4 rounded border mt-5">
-    @if(Model.Any())
+    @if (Model.Any())
     {
         <table class="table table-bordered table-striped border">
             <thead>
@@ -26,13 +26,31 @@
             </thead>
             <tbody>
                 @foreach (var item in Model)
-               {
-                   <tr>
-                       <td> @item.Id </td>
-                       <td> @item.Name </td>
-                       <td></td>
-                   </tr>
-               }
+                {
+                    <tr>
+                        <td> @item.Id </td>
+                        <td> @item.Name </td>
+                        <td>
+                            <div class="text-center">
+                                <form asp-controller="Roles" asp-action="Delete" asp-route-id="@item.Id">
+                                    <a class="btn btn-info text-white"
+                               asp-controller="Roles"
+                               asp-action="InsertUpdate"
+                               asp-route-id="@item.Id"
+                               style="cursor: pointer;">
+                                        Edit
+                                    </a>
+
+                                    <button type="submit"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Are you sure to delete?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     }

@@ -10,7 +10,7 @@
 </div>
 
 <div class="p-4 rounded border mt-5">
-    @if(Model.Any())
+    @if (Model.Any())
     {
         <table class="table table-bordered table-striped border">
             <thead>
@@ -23,14 +23,48 @@
             </thead>
             <tbody>
                 @foreach (var item in Model)
-               {
-                   <tr>
-                       <td> @item.Email </td>
-                       <td> @item.Name </td>
-                       <td> @item.Role </td>
-                       <td></td>
-                   </tr>
-               }
+                {
+                    <tr>
+                        <td> @item.Email </td>
+                        <td> @item.Name </td>
+                        <td> @item.Role </td>
+                        <td>
+                            <div class="text-center">
+                                <form asp-controller="User" asp-action="Delete" asp-route-userId="@item.Id">
+
+                                    <a class="btn btn-info text-white"
+                               asp-controller="User"
+                               asp-action="Edit"
+                               asp-route-userId="@item.Id"
+                               style="cursor: pointer;">
+                                        Edit
+                                    </a>
+
+                                    @if(item.LockoutEnd is null || item.LockoutEnd < DateTime.Now)
+                                    {
+                                        <Button class="btn btn-success text-white"
+                                        asp-controller="User"
+                                        asp-action="LockUnlock"
+                                        asp-route-userId="@item.Id"> Lock </Button>
+                                    }
+                                    else
+                                    {
+                                        <Button class="btn btn-warning text-white"
+                                        asp-controller="User"
+                                        asp-action="LockUnlock"
+                                        asp-route-userId="@item.Id"> Unlock </Button>
+                                    }
+
+                                    <button type="submit"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Are you sure to delete?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     }
