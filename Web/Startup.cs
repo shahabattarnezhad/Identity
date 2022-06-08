@@ -30,6 +30,7 @@ namespace Web
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
         }
 
         
