@@ -26,6 +26,7 @@ namespace Web
             services.ConfigureAuthorization();
             services.ConfigureNumberOfDays();
             services.ConfigureAuthorizationHandler();
+            services.ConfigureFirstNameAuthorizationHandler();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

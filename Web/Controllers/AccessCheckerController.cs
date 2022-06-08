@@ -65,5 +65,11 @@ namespace Web.Controllers
         {
             return View();
         }
+
+        [Authorize(Policy = "FirstNameAuth")]
+        public IActionResult FirstNameAuthentication()
+        {
+            return View();
+        }
     }
 }

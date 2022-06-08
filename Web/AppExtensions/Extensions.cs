@@ -50,6 +50,11 @@ namespace Web.AppExtensions
             services.AddScoped<IAuthorizationHandler, AdminWithOver1000DaysHandler>();
         }
         
+        public static void ConfigureFirstNameAuthorizationHandler(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthorizationHandler, FirstNameAuthHandler>();
+        }
+        
         public static void ConfigureNumberOfDays(this IServiceCollection services)
         {
             services.AddScoped<INumberOfDaysForAccount, NumberOfDaysForAccount>();
@@ -94,6 +99,10 @@ namespace Web.AppExtensions
                 options.AddPolicy("AdminWithMoreThan1000Days", policy =>
                 {
                     policy.Requirements.Add(new AdminWithMoreThan1000DaysRequierment(1000));
+                });
+                options.AddPolicy("FirstNameAuth", policy =>
+                {
+                    policy.Requirements.Add(new FirstNameAuthRequierment("Attarnejad"));
                 });
             });
         }
