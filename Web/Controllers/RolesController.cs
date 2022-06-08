@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -47,6 +48,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "OnlySuperAdminChecker")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InsertUpdate(IdentityRole identityRole)
         {
@@ -88,6 +90,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "OnlySuperAdminChecker")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {

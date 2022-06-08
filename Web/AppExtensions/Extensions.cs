@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Web.Authorize;
 using Web.Data;
 using Web.Services.EmailService;
 
@@ -42,6 +44,16 @@ namespace Web.AppExtensions
         {
             services.AddScoped<IEmailSender, EmailService>();
         }
+        
+        public static void ConfigureAuthorizationHandler(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthorizationHandler, AdminWithOver1000DaysHandler>();
+        }
+        
+        public static void ConfigureNumberOfDays(this IServiceCollection services)
+        {
+            services.AddScoped<INumberOfDaysForAccount, NumberOfDaysForAccount>();
+        }
 
         public static void ConfigureAuthorization(this IServiceCollection services)
         {
@@ -74,6 +86,14 @@ namespace Web.AppExtensions
                         context.User.HasClaim(c => c.Type == "Edit" && c.Value == "True") &&
                         context.User.HasClaim(c => c.Type == "Delete" && c.Value == "True")
                     ) || context.User.IsInRole("SuperAdmin"));
+                });
+                options.AddPolicy("OnlySuperAdminChecker", policy =>
+                {
+                    policy.Requirements.Add(new OnlySuperAdminChecker());
+                });
+                options.AddPolicy("AdminWithMoreThan1000Days", policy =>
+                {
+                    policy.Requirements.Add(new AdminWithMoreThan1000DaysRequierment(1000));
                 });
             });
         }

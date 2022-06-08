@@ -24,6 +24,8 @@ namespace Web
             services.ConfigureIdentityOptions();
             services.ConfigureEmailSetting();
             services.ConfigureAuthorization();
+            services.ConfigureNumberOfDays();
+            services.ConfigureAuthorizationHandler();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

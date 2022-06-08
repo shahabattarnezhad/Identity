@@ -59,5 +59,11 @@ namespace Web.Controllers
         {
             return View();
         }
+
+        [Authorize(Policy = "AdminWithMoreThan1000Days")]
+        public IActionResult SpecialPage()
+        {
+            return View();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -123,7 +124,13 @@ namespace Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, Name = Input.Name };
+                var user = new ApplicationUser 
+                { 
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    Name = Input.Name,
+                    CreatedDate = DateTime.Now
+                };
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
